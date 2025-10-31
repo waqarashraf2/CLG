@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CLG — Contractors Legal Group (One Page)</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts -->
+   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <!-- GSAP -->
+   <canvas id="headerCanvas" class="fixed top-0 left-0 w-full h-[200px] z-0 pointer-events-none"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
+
+
+  <style>
+    :root{ --navy:#0a1a2f; --gold:#c9a227; --muted:#9aa4b2; }
+    body{ font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+    h1,h2,h3{ font-family: 'Poppins', sans-serif; }
+    .hero-bg{ background-size: cover; background-position: center; }
+    .parallax-img{ will-change: transform; }
+    .container-max{ max-width: 1200px; margin-left:auto; margin-right:auto; }
+
+    /* Enhanced Header Styles */
+    .header-scrolled {
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background-color: var(--gold);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .nav-link.active::after {
+      width: 100%;
+    }
+    
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    
+    .mobile-overlay {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .mobile-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hero-section {
+      background-image: linear-gradient(rgba(175, 180, 143, 0.226), rgba(228, 177, 7, 0)), url('hero section.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* Mobile view (max width 768px) */
+    @media (max-width: 768px) {
+      .hero-section {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.168), rgba(0, 0, 0, 0.344)), url('hero-section-mobile.jpg');
+        background-position: top center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: 70vh; /* mobile height */
+        width: 100%;
+        background-attachment: scroll; /* fixed causes issues on mobile */
+      }
+      .right-side-hero{
+        margin-left: 50px;
+      }
+    }
+  </style>
+  
+</head>
+<body class="antialiased text-slate-900 bg-black">
+
+<i class='bx bx-menu'></i>
+
+  <!-- Enhanced NAV -->
+  <header id="main-header" class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] md:w-4/5 z-50 transition-all duration-300">
+    <nav class="flex items-center justify-between px-4 py-3 bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-700 to-indigo-600 flex items-center justify-center text-white font-semibold">CLG</div>
+        <span class="font-semibold">Contractors Legal Group</span>
+      </div>
+      <ul class="hidden md:flex gap-6 text-sm font-medium text-slate-700">
+        <li><a href="#home" class="nav-link smooth-link hover:text-sky-700">Home</a></li>
+        <li><a href="#about" class="nav-link smooth-link hover:text-sky-700">About</a></li>
+        <li><a href="#members" class="nav-link smooth-link hover:text-sky-700">Members</a></li>
+        <li><a href="#resources" class="nav-link smooth-link hover:text-sky-700">Resources</a></li>
+        <li><a href="#contact" class="nav-link smooth-link hover:text-sky-700">Contact</a></li>
+      </ul>
+      <div class="md:hidden" >
+        <i class='bxr  bxs-signal-3 bx-rotate-270'  ></i> 
+        <img id="mobileBtn"  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAACIklEQVR4AeyWOUhdQRSGXxZCimxNmhSp0qUICSSBkJClSpeFhCQkRTZIkSKkSkALRS0EwUZEcAELRREVLERQVLRyRewUrCy0UrAQVFC/fx7zuA5z74z6sFL+75w755x7zvW9uaNncyf8czqw6B94zEd6kal3IaaWsmyFmrzm9hWYhQW4A8dS1sD3dO6GayDdwozBfTiy0gZ+p2MnuPkrxIbhEbh6TOCnwyfWB+Q2VPIpphnOgE+XCPbDdbAq4WIcGh3aWc/ABTDyDXxnMtnmKukXYPXPXnj8PWLfwMg3cNVkwkabSVV6+su6yEAPaNK+gbVk5iFLXSS1gXCHk2/gJi2ewRz4pGEffYmYmG+g7lvHaPNM4ZNqY/EBduFIShuoZhuYJ/Af+uArfIE9SGqbxSJkackmswaqZgtTDa+gFdL0l8Qy+FRPUAcILpcLDTRFEUbv5U3qbjjolPpNrKCYgT+o1hP24i09XP+CpCpY6LdJUkdMGxCXV2igmjZR+hZ0kFvesG6APyB1YErB5q3Xdz5C/DYYhQbquzOFKUaNz5PTzsWl6qXNhAaes4UpXvlQD92qOvmibRrTLMbEPF1Mn+ia0ED3JXcbKy/cuLsu1IQGDrl3OutB1jswAFkqHPShgTV00XafxE8n0BlbzroSpM+YFkjW6HqUmP7qT+CNQgNVVIV5CPpfxvKAdRlYrXGhA8LmrX9OXO8oLq+YgfnKItl9AAAA//9pH7/HAAAABklEQVQDAN6WVTkRvkCfAAAAAElFTkSuQmCC" alt="">
+      </div>
+    </nav>
+  </header>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileOverlay" class="mobile-overlay fixed inset-0 bg-black/50 z-40"></div>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-lg p-6">
+    <div class="flex justify-between items-center mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-700 to-indigo-600 flex items-center justify-center text-white font-semibold">CLG</div>
+        <span class="font-semibold">CLG</span>
+      </div>
+      <button id="closeMenuBtn" class="p-2 rounded-md border">✕</button>
+    </div>
+    <ul class="space-y-4">
+      <li><a href="#home" class="nav-link block py-2 text-slate-700 font-medium smooth-link">Home</a></li>
+      <li><a href="#about" class="nav-link block py-2 text-slate-700 font-medium smooth-link">About</a></li>
+      <li><a href="#members" class="nav-link block py-2 text-slate-700 font-medium smooth-link">Members</a></li>
+      <li><a href="#resources" class="nav-link block py-2 text-slate-700 font-medium smooth-link">Resources</a></li>
+      <li><a href="#contact" class="nav-link block py-2 text-slate-700 font-medium smooth-link">Contact</a></li>
+    </ul>
+  </div>
+
+  
+
+  <!-- HERO SECTION -->
+  <section id="home" class="hero-section relative flex items-center justify- overflow-hidden mt-20">
+    <!-- Blurred right side for large screens only -->
+    <div class="right-side-hero absolute right-0 top-0 h-full w-1/2 backdrop-blur-[30px] bg-black/20 hidden md:block"></div>
+
+    <!-- Content -->
+    <div class="container mx-auto px-6 lg:px-20 relative z-10 text-center">
+      <div class="max-w-xl ml-auto text-white pl-0 md:pl-8">
+        <h1 class="mt-4 text-[1.5rem] md:text-[3rem] font-[500] leading-tight text-[#f2f2f2]">
+          Representing Main <br> Contractors Since <br>
+          <span class="text-[#d4af37] font-semibold">2009</span>
+        </h1>
+        <p class="uppercase tracking-widest text-[13px] font-medium font-semibold">
+          A united voice
+        </p>
+      </div>
+    </div>
+
+    <!-- Optional overlay for contrast -->
+    <div class="absolute inset-0 bg-black/10"></div>
+  </section>
+
+  <!-- Rest of your content remains the same -->
+  <!-- ABOUT -->
+  <section id="about" class="relative py-24">
+    <!-- Background image -->
+    <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('about.jpg');"></div>
+
+    <!-- Text content with blurred background -->
+    <div class="relative z-10 flex justify-center">
+      <div class="max-w-4xl text-center p-8 md:p-16 bg-black/30 backdrop-blur-md rounded-2xl shadow-lg">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-lg">About CLG</h2>
+        <p class="mt-4 text-white text-base md:text-lg leading-relaxed drop-shadow-md">
+          Established in 2009, CLG works closely with the Joint Contracts Tribunal ("JCT") in representing Main Contractors' interests across all JCT contracts. CLG plays an instrumental role in ensuring that JCT's contracts are drafted such that the balance of risk imposed on Main Contractors is fair and equitable, and that such risks are passed down the supply chain where appropriate.
+        </p>
+
+        <p class="mt-4 text-white text-base md:text-lg leading-relaxed drop-shadow-md">
+          Membership with CLG presents the opportunity to be actively involved in implementation and revision of future JCT contracts and supports Continuing Professional Development for organisations involved in construction.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERS -->
+  <section id="members" class="py-20 bg-white">
+    <div class="container-max px-6 lg:px-20 mx-auto">
+      <h3 class="text-3xl font-bold text-navy text-center">Members</h3>
+      <p class="mt-2 text-slate-600 text-center mb-12">Together we can — organisations and trade bodies partnering with CLG.</p>
+
+      <!-- Three logos - 80% page width -->
+      <div class="mx-auto flex flex-wrap justify-center items-center w-4/5 gap-8 ">
+        <img src="NASC.jpg" alt="NASC" class="h-24 object-contain    min-w-[150px]" />
+        <img src="SBF.jpg" alt="SBF" class="h-32 object-contain flex-1 min-w-[150px]" />
+        <img src="NFB.png" alt="NFB" class="h-32 object-contain min-w-[150px]" />
+      </div>
+
+      <!-- Large image below logos -->
+      <div class="mt-16 flex justify-center">
+        <div class="">
+          <img src="scotish building.jpg" alt="Scottish Building" class="w-full h-full position-fixed" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="resources" class="py-20 bg-gray-50">
+    <div class="container-max px-6 lg:px-20 mx-auto">
+      <!-- Heading -->
+      <div class="max-w-3xl mx-auto text-center">
+        <h3 class="text-3xl font-bold text-navy">Resources</h3>
+        <p class="mt-2 text-slate-600 text-lg">Your CLG Resource Hub</p>
+        <p class="mt-4 text-slate-600">Guides, handbooks and services to help contractors manage contractual risk and resolve disputes quickly and fairly.</p>
+      </div>
+
+      <div class="mt-12 space-y-20">
+        <!-- Resource 1 -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-1 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content1.jpg" alt="Join CLG" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-2">
+            <h4 class="text-2xl font-semibold text-navy">Join CLG</h4>
+            <p class="mt-3 text-slate-700">Membership with CLG would present to your organisation the opportunity to be actively involved in the implementation and revision of all future JCT contracts. CLG membership will also address most Continuing Professional Development requirements as prescribed by our industry. We welcome applications from all Main Contractors.</p>
+          </div>
+        </div>
+
+        <!-- Resource 2 (reverse) -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-2 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content2.jpg" alt="Adjudicator Nomination Service" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-1">
+            <h4 class="text-2xl font-semibold text-navy">Adjudicator Nomination Service</h4>
+            <p class="mt-3 text-slate-700">CLG offers an experienced adjudicator nomination service for resolving construction disputes in a simple and cost effective manner. Our Adjudicator Nomination Body ("ANB") is one of four listed and approved ANB bodies named in JCT contracts as well as being named in other contracts such as DOM/1 and DOM/2.</p>
+          </div>
+        </div>
+
+        <!-- Resource 3 -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-1 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content3.jpg" alt="Construction Contractual Handbook" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-2">
+            <h4 class="text-2xl font-semibold text-navy">The Construction Contractual Handbook</h4>
+            <p class="mt-3 text-slate-700">Edited by RCB's managing partner, John Bradley, and Simon Kerry and Michael Levenstein of Hardwicke Law, this is the essential Construction Contractual Handbook for everyone involved in construction. The handbook sets out the law and contracts in a compact, clear and accessible manner.</p>
+          </div>
+        </div>
+
+        <!-- Resource 4 (reverse) -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-2 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content4.jpg" alt="National Federation of Builders" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-1">
+            <h4 class="text-2xl font-semibold text-navy">National Federation of Builders</h4>
+            <p class="mt-3 text-slate-700">Founded in 1846, the NFB is the industry's longest established trade body. They represent builders, contractors, and house builders across England and Wales.</p>
+          </div>
+        </div>
+
+        <!-- Resource 5 -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-1 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content5.jpg" alt="Scottish Building Federation" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-2">
+            <h4 class="text-2xl font-semibold text-navy">Scottish Building Federation</h4>
+            <p class="mt-3 text-slate-700">The SBF represents employers in the Scottish construction industry. With headquarters in Edinburgh, the SBF comprises of 16 regional associations and represents around 700 companies.</p>
+          </div>
+        </div>
+
+        <!-- Resource 6 (reverse) -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="order-1 md:order-2 flex justify-center">
+            <div class="overflow-hidden rounded-3xl shadow-xl bg-white transform transition duration-300 hover:scale-105">
+              <img src="content6.jpg" alt="National Access and Scaffolding Confederation" class="w-full h-full object-cover aspect-[945/550]" />
+            </div>
+          </div>
+          <div class="order-2 md:order-1">
+            <h4 class="text-2xl font-semibold text-navy">National Access and Scaffolding Confederation</h4>
+            <p class="mt-3 text-slate-700">The NASC is a leading trade body in the UK for the access and scaffolding industry. Established in 1945, the NASC now represents over 240 contracting firms, scaffolding manufacturers and businesses.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="py-20 bg-white relative">
+    <!-- Background Image -->
+    <div class="absolute inset-0">
+      <img src="contect.jpg" alt="Contact CLG" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-black/30"></div> <!-- optional dark overlay for contrast -->
+    </div>
+
+    <!-- Content -->
+    <div class="relative container-max px-6 lg:px-20 mx-auto">
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        
+        <!-- Contact Info -->
+        <div class="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-lg">
+          <h3 class="text-2xl font-bold text-navy">Contact CLG</h3>
+          <address class="not-italic mt-3 text-slate-700">
+            Contractors Legal Group<br/>
+            32 Woodville Road<br/>
+            Barnet, London, EN5 5HA
+          </address>
+          <p class="mt-2 text-slate-700">Email: <a href="mailto:John.Bradley@clgcontractors.com" class="text-sky-700">John.Bradley@clgcontractors.com</a></p>
+          <p class="mt-2 text-slate-700">DD: 07747 767444</p>
+
+          <div class="mt-6">
+            <a href="mailto:John.Bradley@clgcontractors.com" class="inline-block px-5 py-3 rounded-lg bg-sky-700 text-white font-semibold">Get in Touch</a>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">Contractors Legal Group and/or CLG are trading names of Contractors Legal Grp Ltd — Registration no. 7049997. Registered Office: 32 Woodville Road, Barnet, Herts, EN5 5HA</p>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-lg">
+          <form id="contactForm">
+            <label class="block">
+              <span class="text-sm font-medium text-slate-700">Your name</span>
+              <input id="name" required class="mt-2 block w-full rounded-md border border-gray-200 p-2" placeholder="Full name" />
+            </label>
+            <label class="block mt-4">
+              <span class="text-sm font-medium text-slate-700">Email</span>
+              <input id="email" type="email" required class="mt-2 block w-full rounded-md border border-gray-200 p-2" placeholder="you@example.com" />
+            </label>
+            <label class="block mt-4">
+              <span class="text-sm font-medium text-slate-700">Message</span>
+              <textarea id="message" class="mt-2 block w-full rounded-md border border-gray-200 p-2" rows="5" placeholder="How can we help?"></textarea>
+            </label>
+            <div class="mt-4 text-right">
+              <button type="submit" class="px-5 py-2 rounded-lg bg-sky-700 text-white font-semibold">Send</button>
+            </div>
+            <p id="formStatus" class="mt-3 text-sm text-slate-600 hidden"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add this CSS to the style section -->
+<style>
+  /* Mobile bottom navigation icons */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: none;
+    justify-content: space-around;
+    padding: 12px 0;
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .mobile-bottom-nav.show {
+    transform: translateY(0);
+  }
+  
+  .mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--navy);
+    font-size: 12px;
+    gap: 4px;
+  }
+  
+  .mobile-bottom-nav .nav-icon {
+    font-size: 20px;
+    color: var(--navy);
+  }
+  
+  .mobile-bottom-nav .nav-item:hover .nav-icon {
+    color: var(--gold);
+  }
+  
+  /* Show only on mobile screens */
+  @media (max-width: 768px) {
+    .mobile-bottom-nav {
+      display: flex;
+    }
+  }
+</style>
+
+<!-- Add this HTML before the closing body tag -->
+<div class="mobile-bottom-nav" id="mobileBottomNav">
+  <a href="tel:+447747767444" class="nav-item">
+    <i class='bx bx-phone nav-icon'></i>
+    <span>Call</span>
+  </a>
+  <a href="mailto:John.Bradley@clgcontractors.com" class="nav-item">
+    <i class='bx bx-envelope nav-icon'></i>
+    <span>Email</span>
+  </a>
+  <a href="https://www.google.com/maps/dir//Bury+House,+31+Bury+St,+London+EC3A+5AR,+United+Kingdom/@51.5140769,-0.1617163,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x4876034d2498e553:0x3a22eb9cc52a3720!2m2!1d-0.0793161!2d51.5141058?entry=ttu&g_ep=EgoyMDI1MTAyOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="nav-item">
+    <i class='bx bx-map nav-icon'></i>
+    <span>Location</span>
+  </a>
+</div>
+
+<!-- Add this JavaScript to handle scroll behavior -->
+<script>
+  // Mobile bottom nav scroll behavior
+  let lastScrollTop = 0;
+  const mobileBottomNav = document.getElementById('mobileBottomNav');
+  const scrollThreshold = 100; // Minimum scroll before showing/hiding
+  
+  window.addEventListener('scroll', function() {
+    // Only apply on mobile screens
+    if (window.innerWidth > 768) return;
+    
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+      // Scrolling down - show the nav
+      mobileBottomNav.classList.add('show');
+    } else {
+      // Scrolling up - hide the nav
+      mobileBottomNav.classList.remove('show');
+    }
+    
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+  }, false);
+</script>
+
+  <!-- FOOTER -->
+  <footer class="py-8 text-center text-sm text-slate-500 bg-slate-100">
+    <div class="container-max px-6 lg:px-20 mx-auto">© <span id="year"></span> Contractors Legal Grp Ltd. All Rights Reserved.</div>
+  </footer>
+
+  <script>
+    // Smooth scroll nav
+    document.querySelectorAll('.smooth-link').forEach(a=>{
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        const id = this.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+        
+        // Close mobile menu if open
+        closeMobileMenu();
+        
+        // Update active nav link
+        updateActiveNavLink(id);
+      });
+    });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // GSAP
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from('header nav', { y:-30, opacity:0, duration:0.7 });
+    gsap.utils.toArray('section').forEach(sec=>{
+      gsap.from(sec.querySelectorAll('h2,h3,h4,p,li,img'),{ y:30, opacity:0, duration:0.7, stagger:0.06, scrollTrigger:{ trigger:sec, start:'top 85%' } });
+    });
+
+    // Parallax images
+    gsap.utils.toArray('.parallax-img').forEach(img=>{
+      gsap.to(img, { yPercent: -10, ease: 'none', scrollTrigger:{ trigger: img, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
+    });
+
+    // Header scroll effect
+    const header = document.getElementById('main-header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('header-scrolled');
+      } else {
+        header.classList.remove('header-scrolled');
+      }
+      
+      // Update active nav link based on scroll position
+      updateActiveNavOnScroll();
+    });
+
+    // Mobile menu functionality
+    const mobileBtn = document.getElementById('mobileBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    
+    function openMobileMenu() {
+      mobileMenu.classList.add('open');
+      mobileOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      mobileOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    
+    mobileBtn.addEventListener('click', openMobileMenu);
+    closeMenuBtn.addEventListener('click', closeMobileMenu);
+    mobileOverlay.addEventListener('click', closeMobileMenu);
+
+    // Update active nav link
+    function updateActiveNavLink(activeId) {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${activeId}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Update active nav link on scroll
+    function updateActiveNavOnScroll() {
+      const sections = document.querySelectorAll('section[id]');
+      const scrollPos = window.scrollY + 100;
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute('id');
+        
+        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+          updateActiveNavLink(sectionId);
+        }
+      });
+    }
+
+    // Contact form mock
+    document.getElementById('contactForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const status = document.getElementById('formStatus');
+      status.classList.remove('hidden');
+      status.textContent = 'Thanks — message prepared. Configure a server endpoint to actually send.';
+    });
+  </script>
+</body>
+</html>
